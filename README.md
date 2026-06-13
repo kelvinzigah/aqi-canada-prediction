@@ -38,9 +38,41 @@ aqi-canada-prediction/
 
 ## Setup
 
+**1. Clone the repo**
+```bash
+git clone https://github.com/kelvinzigah/aqi-canada-prediction.git
+cd aqi-canada-prediction
+```
+
+**2. Create the virtual environment**
+```bash
+python -m venv .venv
+```
+
+**3. Activate it**
+
+- Windows (PowerShell):
+  ```powershell
+  .\.venv\Scripts\Activate.ps1
+  ```
+- Mac/Linux:
+  ```bash
+  source .venv/bin/activate
+  ```
+
+**4. Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
+
+**5. Verify**
+```bash
+pip list
+```
+
+You should see packages like `pandas`, `scikit-learn`, `jupyter`, etc.
+
+> To deactivate the venv when done: run `deactivate`
 
 ## Workflow
 
