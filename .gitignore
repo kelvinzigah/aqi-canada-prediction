@@ -13,7 +13,12 @@ data/raw/*
 !data/raw/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
+!data/processed/air_quality_project_dataset.csv
 
 # OS
 .DS_Store
 Thumbs.db
+
+#Kelvin's AI tools
+.claude/
+.firecrawl/
