@@ -2,6 +2,10 @@
 
 Predicting Air Quality Index (AQI) values across Canadian cities using machine learning.
 
+Goal: Our project goal is to train various machine learning models to accurately predict **future** AQHI values in the Montreal, Trudeau airport region. This will be done by using past historical measurements of pollutants and AQHI values at specific timeframes. 
+
+
+
 ## Project Structure
 
 ```

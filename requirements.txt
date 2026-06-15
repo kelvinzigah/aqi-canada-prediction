@@ -8,3 +8,4 @@ jupyter
 notebook
 requests
 python-dotenv
+
