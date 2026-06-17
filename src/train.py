@@ -2,9 +2,21 @@
 #The purpose of this section is to train the machine learning models defined in models.py on the training dataset, and make predictions on the test dataset. 
 #The performance of the models will then be evaluated using mean squared error (MSE) as the evaluation metric.
 
+#Source used:
+#[Train_1] https://github.com/jagwithyou/linear-regression-example/blob/master/simple_and_multiple_linear_regression.ipynb
+#[Train_2] https://stackoverflow.com/questions/13411544/delete-a-column-from-a-pandas-dataframe
+#[Train_3] https://www.kaggle.com/code/tomwarrens/timeseriessplit-how-to-use-it
+##[Train_4] https://stackoverflow.com/questions/50879915/splitting-data-using-time-based-splitting-in-test-and-train-datasets
+#[Train_5] https://stackoverflow.com/questions/62149138/how-to-split-dataset-as-train-and-test-data-into-rows-using-date-pandas-and-pyt
+#[Train_6] https://apxml.com/courses/time-series-analysis-forecasting/chapter-6-model-evaluation-selection/train-test-split-time-series
+
+
+
 from load_data import load_data
 from models import linear_regression_model, lasso_regression_model, knn_regression_model, decision_tree_regression_model, random_forest_regression_model
-from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+from features import TARGET_VARIABLE
+from evaluate import model_evaluation
 
 import numpy as np
 import pandas as pd
@@ -13,63 +25,47 @@ import pandas as pd
 #SETUP BEFORE TRAINING THE MODELS:
 #-----------------------------------------------------------------------
 
-#Importing the training dataset, which has been preprocessed in preprocess_data.py and sent to load_data.py.
-data = load_data()
-#Giving a small overview of the dataset:
-print("Dataset overview:")
+data = load_data() #Importing the training dataset, which has been preprocessed in preprocess_data.py and sent to load_data.py.
+print("Dataset overview:") #Giving a small overview of the dataset:
 print(data.info()) #Print the summary of the dataset, including the number of non-null values and the data types of each column.
 print(data.head()) #Print the first 5 rows of the dataset
 
 #Identifiying our input features and target variable:
-features = data.drop(columns=[TARGET_VARIABLE]) #Dropping the target variable column to get the input features.
-target = data[TARGET_VARIABLE] #Getting the target variable column.
-
-X = data[features] #Input features
-y = data[target] #Target variable
+X = data.drop(["index", "Date", "Season", TARGET_VARIABLE], axis = 1, errors = "ignore") #Getting our input features [Train_1]
+y = data[TARGET_VARIABLE] #Getting our target.
 
 print("Input features:")
-display(X.head()) #Print the first 5 rows of the input features.
+print(X.head()) #Print the first 5 rows of the input features.
 print("Target variable:")
-display(y.head()) #Print the first 5 rows of the target variable.
-
-
-#Source for graph plotting: https://github.com/jagwithyou/linear-regression-example/blob/master/simple_and_multiple_linear_regression.ipynb
-
-#Plotting a graph to see an overview of the relationship between the input features and the target variable (AQHI).
-plt.figure(figsize=(10, 6))
-plt.scatter(X['O3'], y, label='O3', c='blue') #Scatter plot of O3 concentration vs AQHI index.
-plt.xlabel('O3 Concentration')
-plt.ylabel('AQHI Index')
-plt.title('Relationship between O3 Concentration and AQHI Index')
-plt.legend()
-plt.show()
-
-plt.figure(figsize=(10, 6))
-plt.scatter(X['NO2'], y, label='NO2', c='orange') #Scatter plot of NO2 concentration vs AQHI index.
-plt.xlabel('NO2 Concentration')
-plt.ylabel('AQHI Index')
-plt.title('Relationship between NO2 Concentration and AQHI Index')
-plt.legend()
-plt.show()
-
-plt.figure(figsize=(10, 6))
-plt.scatter(X['PM2.5'], y, label='PM2.5', c='green') #Scatter plot of PM2.5 concentration vs AQHI index.
-plt.xlabel('PM2.5 Concentration')
-plt.ylabel('AQHI Index')
-plt.title('Relationship between PM2.5 Concentration and AQHI Index')
-plt.legend()
-plt.show()
-
+print(y.head()) #Print the first 5 rows of the target variable.
 
 #-----------------------------------------------------------------------
 #TRAINING THE MODELS AND MAKING PREDICTIONS
 #-----------------------------------------------------------------------
 
-
-#Splitting the dataset into training and test sets, using an 80-20 split.
 #Because we want to predict future AQHI values, we will use the most recent 20% of the data as the test set, and the rest as the training set.
-#So, 2024 data will be in the test set, and the rest of the data will be in the training set.
+#The training set is 80% of the data (2020-2023)
+#The test set is the remaining 20% (2024)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle = False) #[Train_5]
+
+print("Training sample length:", len(X_train))
+print("Test sample length:", len(X_test))
 
 
+#1) Simple Linear Regression Model
+#For our baseline model, only AQHI will be used to compare to future AQHI values. The reason is that we want to have a basic comparison to start with.
 
-#Main function to train the models and make predictions on the test dataset.
+linear_model = linear_regression_model() #Getting the linear regression model defined in models.py.
+linear_model.fit(X_train[["AQHI"]], y_train) #Training the linear regression model on the training dataset, only using the present AQHI to predict the future AQHI.
+
+y_pred_linear = linear_model.predict(X_test[["AQHI"]]) #Making predictions on the test dataset using the trained linear regression model.
+
+mse, mae, rmse, mape = model_evaluation(y_test, y_pred_linear) #Using the evaluation function in evaluate.py to evaluate our models:
+print("For the baseline linear regression model: \n")
+print("MSE:", mse)
+print("MAE:", mae)
+print("RMSE:", rmse)
+print("MAPE:", mape)
+
+
