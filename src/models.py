@@ -16,23 +16,23 @@ from sklearn.ensemble import RandomForestRegressor
 
 
 
-#1) Linear Regression model (baseline model)
-#Reason: A good simple model to start with, since we are trying to predict a continuous variable (AQHI).
-def linear_regression_model():
-    return LinearRegression()
+#1) Simple Linear Regression model (baseline model)
+#Reason: A good simple model to start with, since we are trying to predict a continuous variable (AQHI). We will only compare the current AQHI with future AQHI here.
+def linear_regression_model_base():
+    return LinearRegression_base()
 
 
-#2) Lasso Regression model (regularization model)
+#2) Linear Regression model with lag features
+#Reason: We want to use a more thorough Linear Regression Model that uses all of the features to pridict the future AQHI.
+def linear_regression_model_lag():
+    return LinearRegression_lag()
+
+
+#3) Lasso Regression model (regularization model)
 #Reason: Since we are including extra features outside the AQHI formula, we want to use a regularization model to prevent overfitting and improve the generalization of the model.
 def lasso_regression_model():
     return Lasso(alpha=0.1) #Setting alpha to 0.1 for regularization strength, this can be tuned based on the dataset and performance.
 
-
-#3) K-nearest neighbors (KNN) regression model (non-linear model)
-#Reason: Does not assume anything about the data distribution. It can capture non-linear patterns of the features and the target variable (AQHI).
-#Important note: Scaling is very important here, since KNN uses the distance between data points to make predictions. If the features are not scalled properly, we can have bad results. 
-def knn_regression_model():
-    return KNeighborsRegressor(n_neighbors=5) #Setting n_neighbors to 5, this can be tuned based on the dataset and performance.
 
 
 #4) Decision Tree regression model (non-linear model)
