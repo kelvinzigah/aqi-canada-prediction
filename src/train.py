@@ -13,7 +13,7 @@
 
 
 from load_data import load_data
-from models import linear_regression_model_base, linear_regression_model_lag  lasso_regression_model, decision_tree_regression_model, random_forest_regression_model
+from models import linear_regression_model_base, linear_regression_model_lag, lasso_regression_model, decision_tree_regression_model, random_forest_regression_model
 from sklearn.model_selection import train_test_split
 from features import TARGET_VARIABLE
 from evaluate import model_evaluation
@@ -75,10 +75,10 @@ print("MAPE:", mape)
 linear_model = linear_regression_model_lag()
 linear_model.fit(X_train, y_train)
 
-y_pred_linear = base_linear_model.predict(X_test) #Making predictions on the test dataset using the trained linear regression model.
+y_pred_linear = linear_model.predict(X_test) #Making predictions on the test dataset using the trained linear regression model.
 
 mse, mae, rmse, mape = model_evaluation(y_test, y_pred_linear) 
-print("For the baseline linear regression model: \n")
+print("For the baseline linear regression model with lag features: \n")
 print("MSE:", mse)
 print("MAE:", mae)
 print("RMSE:", rmse)
@@ -89,10 +89,10 @@ print("MAPE:", mape)
 DT_model = decision_tree_regression_model()
 DT_model.fit(X_train, y_train)
 
-y_pred_DT = decision_tree_regression_model.predict(X_test)
+y_pred_DT = DT_model.predict(X_test)
 
-mse, mae, rmse, mape = model_evaluation(y_test, y_pred_linear) 
-print("For the baseline linear regression model: \n")
+mse, mae, rmse, mape = model_evaluation(y_test, y_pred_DT) 
+print("For the Decision Tree regression model: \n")
 print("MSE:", mse)
 print("MAE:", mae)
 print("RMSE:", rmse)
