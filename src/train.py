@@ -13,7 +13,7 @@
 
 
 from load_data import load_data
-from models import linear_regression_model, lasso_regression_model, knn_regression_model, decision_tree_regression_model, random_forest_regression_model
+from models import linear_regression_model_base, linear_regression_model_lag  lasso_regression_model, decision_tree_regression_model, random_forest_regression_model
 from sklearn.model_selection import train_test_split
 from features import TARGET_VARIABLE
 from evaluate import model_evaluation
@@ -56,10 +56,10 @@ print("Test sample length:", len(X_test))
 #1) Simple Linear Regression Model
 #For our baseline model, only AQHI will be used to compare to future AQHI values. The reason is that we want to have a basic comparison to start with.
 
-linear_model = linear_regression_model() #Getting the linear regression model defined in models.py.
-linear_model.fit(X_train[["AQHI"]], y_train) #Training the linear regression model on the training dataset, only using the present AQHI to predict the future AQHI.
+base_linear_model = linear_regression_model_base() #Getting the linear regression model defined in models.py.
+base_linear_model.fit(X_train[["AQHI"]], y_train) #Training the linear regression model on the training dataset, only using the present AQHI to predict the future AQHI.
 
-y_pred_linear = linear_model.predict(X_test[["AQHI"]]) #Making predictions on the test dataset using the trained linear regression model.
+y_pred_linear = base_linear_model.predict(X_test[["AQHI"]]) #Making predictions on the test dataset using the trained linear regression model.
 
 mse, mae, rmse, mape = model_evaluation(y_test, y_pred_linear) #Using the evaluation function in evaluate.py to evaluate our models:
 print("For the baseline linear regression model: \n")
@@ -69,4 +69,33 @@ print("RMSE:", rmse)
 print("MAPE:", mape)
 
 
-#Linear Regression with lag features
+#2) Linear Regression with lag features
+#From now on, we will use all intended features to help predict the future AQHI value.
+
+linear_model = linear_regression_model_lag()
+linear_model.fit(X_train, y_train)
+
+y_pred_linear = base_linear_model.predict(X_test) #Making predictions on the test dataset using the trained linear regression model.
+
+mse, mae, rmse, mape = model_evaluation(y_test, y_pred_linear) 
+print("For the baseline linear regression model: \n")
+print("MSE:", mse)
+print("MAE:", mae)
+print("RMSE:", rmse)
+print("MAPE:", mape)
+
+#4) Decision Tree regression model
+
+DT_model = decision_tree_regression_model()
+DT_model.fit(X_train, y_train)
+
+y_pred_DT = decision_tree_regression_model.predict(X_test)
+
+mse, mae, rmse, mape = model_evaluation(y_test, y_pred_linear) 
+print("For the baseline linear regression model: \n")
+print("MSE:", mse)
+print("MAE:", mae)
+print("RMSE:", rmse)
+print("MAPE:", mape)
+
+
