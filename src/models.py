@@ -1,5 +1,7 @@
-from skilearn.linear_model import LinearRegression
-from skilearn.metrics import mean_squared_error
+from sklearn.linear_model import LinearRegression, Lasso
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
 
 #The purpose of this file is just to define the machine learning models that will be used for training and prediction. 
 #The models will then be called in train.py to train the model on the training dataset and make predictions on the test dataset.
