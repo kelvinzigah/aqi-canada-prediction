@@ -45,11 +45,11 @@ def knn_regression_model():
 #4) Decision Tree regression model (non-linear model)
 #Reason: Can be used to provide more information about feature important, and captures the data patterns, not the data points.
 def decision_tree_regression_model():
-    return DecisionTreeRegressor(max_depth=5) #Setting max_depth to 5 to prevent overfitting, this can be tuned based on the dataset and performance.
+    return DecisionTreeRegressor(max_depth=5, random_state=42) #Setting max_depth to 5 to prevent overfitting, this can be tuned based on the dataset and performance.
 
 
 #5) Random Forest regression model (ensemble model)
 #Reason: By using an emsemble of decision trees, we can improve the performance and reduce the overfitting of the model. It also makes the trees less correlated with each other, which imroves generalization.
 def random_forest_regression_model():
-    return RandomForestRegressor(n_estimators=100, max_depth=5) #Setting n_estimators to 100 for the number of trees in the forest, and max_depth to 5 to prevent overfitting, these can be tuned based on the dataset and performance.
+    return RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42) #Setting n_estimators to 100 for the number of trees in the forest, and max_depth to 5 to prevent overfitting, these can be tuned based on the dataset and performance.
 
