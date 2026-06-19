@@ -68,17 +68,29 @@ print("MAE:", mae)
 print("RMSE:", rmse)
 print("MAPE:", mape)
 
-
 #2) Linear Regression with lag features
 #From now on, we will use all intended features to help predict the future AQHI value.
 
 linear_model = linear_regression_model_lag()
 linear_model.fit(X_train, y_train)
 
-y_pred_linear = base_linear_model.predict(X_test) #Making predictions on the test dataset using the trained linear regression model.
+y_pred_linear = linear_model.predict(X_test) #Making predictions on the test dataset using the trained linear regression model.
 
 mse, mae, rmse, mape = model_evaluation(y_test, y_pred_linear) 
-print("For the baseline linear regression model: \n")
+print("For the linear regression model with lag features: \n")
+print("MSE:", mse)
+print("MAE:", mae)
+print("RMSE:", rmse)
+print("MAPE:", mape)
+
+#3) Lasso Regression model
+lasso_model = lasso_regression_model()
+lasso_model.fit(X_train, y_train)
+
+y_pred_lasso = lasso_model.predict(X_test)
+
+mse, mae, rmse, mape = model_evaluation(y_test, y_pred_lasso)
+print("For the Lasso regression model: \n")
 print("MSE:", mse)
 print("MAE:", mae)
 print("RMSE:", rmse)
@@ -89,13 +101,25 @@ print("MAPE:", mape)
 DT_model = decision_tree_regression_model()
 DT_model.fit(X_train, y_train)
 
-y_pred_DT = decision_tree_regression_model.predict(X_test)
+y_pred_DT = DT_model.predict(X_test)
 
-mse, mae, rmse, mape = model_evaluation(y_test, y_pred_linear) 
-print("For the baseline linear regression model: \n")
+mse, mae, rmse, mape = model_evaluation(y_test, y_pred_DT) 
+print("For the Decision Tree regression model: \n")
 print("MSE:", mse)
 print("MAE:", mae)
 print("RMSE:", rmse)
 print("MAPE:", mape)
 
+#5) Random Forest regression model
+RF_model = random_forest_regression_model()
+RF_model.fit(X_train, y_train)
+
+y_pred_RF = RF_model.predict(X_test)
+
+mse, mae, rmse, mape = model_evaluation(y_test, y_pred_RF)
+print("For the Random Forest regression model: \n")
+print("MSE:", mse)
+print("MAE:", mae)
+print("RMSE:", rmse)
+print("MAPE:", mape)
 
