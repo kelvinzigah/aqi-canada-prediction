@@ -13,7 +13,7 @@
 
 
 from load_data import load_data
-from models import linear_regression_model_base, linear_regression_model_lag  lasso_regression_model, decision_tree_regression_model, random_forest_regression_model
+from models import linear_regression_model_base, linear_regression_model_lag, lasso_regression_model, decision_tree_regression_model, random_forest_regression_model, knn_regression_model
 from sklearn.model_selection import train_test_split
 from features import TARGET_VARIABLE
 from evaluate import model_evaluation
@@ -52,6 +52,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle
 print("Training sample length:", len(X_train))
 print("Test sample length:", len(X_test))
 
+#Add code to show first 5 rows of training and test, to make sure its sorted.
+
 
 #1) Simple Linear Regression Model
 #For our baseline model, only AQHI will be used to compare to future AQHI values. The reason is that we want to have a basic comparison to start with.
@@ -75,6 +77,7 @@ linear_model = linear_regression_model_lag()
 linear_model.fit(X_train, y_train)
 
 y_pred_linear = linear_model.predict(X_test) #Making predictions on the test dataset using the trained linear regression model.
+y_pred_linear = linear_model.predict(X_test) #Making predictions on the test dataset using the trained linear regression model.
 
 mse, mae, rmse, mape = model_evaluation(y_test, y_pred_linear) 
 print("For the linear regression model with lag features: \n")
@@ -95,6 +98,7 @@ print("MSE:", mse)
 print("MAE:", mae)
 print("RMSE:", rmse)
 print("MAPE:", mape)
+
 
 #4) Decision Tree regression model
 
@@ -118,8 +122,11 @@ y_pred_RF = RF_model.predict(X_test)
 
 mse, mae, rmse, mape = model_evaluation(y_test, y_pred_RF)
 print("For the Random Forest regression model: \n")
+mse, mae, rmse, mape = model_evaluation(y_test, y_pred_RF)
+print("For the Random Forest regression model: \n")
 print("MSE:", mse)
 print("MAE:", mae)
 print("RMSE:", rmse)
 print("MAPE:", mape)
 
+    
