@@ -92,13 +92,10 @@ for pollutant in pollutants:
     # Keep only pollutants used in AQHI calculation
 
 df = df[
-
     (df["Pollutant"] == "NO2") |
-
     (df["Pollutant"] == "O3") |
-
-    (df["Pollutant"] == "PM25")
-
+    (df["Pollutant"] == "PM25") |
+    (df["Pollutant"] == "CO")
 ]
 
 print("Dataset shape after keeping AQHI pollutants:")
@@ -212,7 +209,7 @@ df_3hour = df_pivot.groupby(
 
     ["Date", "Day", "Month", "ThreeHourBlock"]
 
-)[["NO2", "O3", "PM25"]].mean()
+)[["CO","NO2", "O3", "PM25"]].mean()
 
 df_3hour = df_3hour.reset_index()
 
@@ -248,7 +245,7 @@ df_daily = df_3hour.groupby(
 
     ["Date", "Day", "Month"]
 
-)[["NO2", "O3", "PM25", "AQHI"]].mean()
+)[["CO","NO2", "O3", "PM25", "AQHI"]].mean()
 
 df_daily = df_daily.reset_index()
 
@@ -378,6 +375,9 @@ df_daily = df_daily[df_daily["AQHI_PreviousDay"].notna()]
 print("Dataset shape after removing missing target:")
 print(df_daily.shape)
 
+# Fill missing CO values with the median CO value
+df_daily["CO"] = df_daily["CO"].fillna(df_daily["CO"].median())
+
 # Check missing values after removing missing target
 print("Missing values after removing missing target:")
 print(df_daily.isnull().sum())
@@ -391,6 +391,7 @@ df_daily = df_daily[
         "Day",
 
         "Month",
+        "CO" ,
 
         "NO2",
 
@@ -419,6 +420,7 @@ X = df_daily[
     [
         "Day",
         "Month",
+        "CO" ,
         "Season_Code",
         "NO2",
         "O3",
