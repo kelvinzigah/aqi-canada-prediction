@@ -122,8 +122,6 @@ y_pred_RF = RF_model.predict(X_test)
 
 mse, mae, rmse, mape = model_evaluation(y_test, y_pred_RF)
 print("For the Random Forest regression model: \n")
-mse, mae, rmse, mape = model_evaluation(y_test, y_pred_RF)
-print("For the Random Forest regression model: \n")
 print("MSE:", mse)
 print("MAE:", mae)
 print("RMSE:", rmse)
