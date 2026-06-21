@@ -1,4 +1,10 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+
+from statsmodels.graphics.tsaplots import (
+    plot_acf,
+    plot_pacf
+)
 
 #---------------------------------------------------------------
 #Part A : Data Understanding
@@ -253,9 +259,6 @@ df_daily = df_daily.reset_index()
 
 df_daily["AQHI_NextDay"] = df_daily["AQHI"].shift(-1)
 
-# Create previous day's AQHI (lag feature)
-
-df_daily["AQHI_PreviousDay"] = df_daily["AQHI"].shift(1)
 
 print(
 
@@ -264,8 +267,6 @@ print(
         [
 
             "Date",
-
-            "AQHI_PreviousDay",
 
             "AQHI",
 
@@ -276,6 +277,21 @@ print(
     ].head(10)
 
 )
+
+# Lag feature for AQHI 50 days (creates 50 features)
+
+for lag in range(1, 51):
+
+    df_daily[f"AQHI_Lag_{lag}"] = df_daily["AQHI"].shift(lag)
+
+# Show the lagged data structure
+
+lag_columns = ["Date", "AQHI"] + [f"AQHI_Lag_{lag}" for lag in range(1, 51)]
+
+print("Lagged AQHI data structure:")
+
+print(df_daily[lag_columns].head(60))
+
 # Create Season feature
 
 df_daily["Season"] = ""
@@ -318,6 +334,8 @@ print(df_daily[["Month", "Season", "Season_Code"]].head())
 print(df_daily.head())
 
 print("Daily dataset shape:", df_daily.shape)
+
+
 
   #--------------------------------------------------------------
 # Part E: Data Preparation for Modeling
@@ -368,12 +386,31 @@ print(df_daily.shape)
 # Remove only rows where the target variable is missing
 df_daily = df_daily[df_daily["AQHI_NextDay"].notna()]
 
-# Remove rows with missing previous day AQHI
+# Remove rows with missing lag values
+lag_feature_columns = [f"AQHI_Lag_{lag}" for lag in range(1, 51)]
 
-df_daily = df_daily[df_daily["AQHI_PreviousDay"].notna()]
+df_daily = df_daily.dropna(subset=lag_feature_columns)
 
-print("Dataset shape after removing missing target:")
-print(df_daily.shape)
+ordered_columns = (
+    [
+        "Date",
+        "Day",
+        "Month",
+        "CO",
+        "NO2",
+        "O3",
+        "PM25",
+        "Season",
+        "Season_Code"
+    ]
+    + [f"AQHI_Lag_{lag}" for lag in range(50, 0, -1)]
+    + [
+        "AQHI",
+        "AQHI_NextDay"
+    ]
+)
+
+df_daily = df_daily[ordered_columns]
 
 # Fill missing CO values with the median CO value
 df_daily["CO"] = df_daily["CO"].fillna(df_daily["CO"].median())
@@ -382,52 +419,35 @@ df_daily["CO"] = df_daily["CO"].fillna(df_daily["CO"].median())
 print("Missing values after removing missing target:")
 print(df_daily.isnull().sum())
 
-df_daily = df_daily[
 
-    [
-
-        "Date",
-
-        "Day",
-
-        "Month",
-        "CO" ,
-
-        "NO2",
-
-        "O3",
-
-        "PM25",
-
-        "AQHI_PreviousDay",
-
-        "AQHI",
-
-        "AQHI_NextDay",
-
-        "Season",
-
-        "Season_Code"
-
-    ]
-
-]
 
 print(df_daily.head())
 
 # Features and target variable
 X = df_daily[
+
     [
+
         "Day",
+
         "Month",
-        "CO" ,
+
+        "CO",
+
         "Season_Code",
+
         "NO2",
+
         "O3",
+
         "PM25",
-        "AQHI",
-        "AQHI_PreviousDay"
+
     ]
+
+    + [f"AQHI_Lag_{lag}" for lag in range(50, 0, -1)]
+
+    + ["AQHI"]
+
 ]
 
 y = df_daily["AQHI_NextDay"]
@@ -441,3 +461,84 @@ df_daily.to_csv(
     "air_quality_project_dataset.csv",
     index=False
 )
+print("CSV saved successfully!")
+# ACF and PACF Analysis
+
+
+aqhi_series = df_daily["AQHI"].dropna()
+
+# ACF
+
+plt.figure(figsize=(10,5))
+
+plot_acf(aqhi_series, lags=50)
+
+plt.title("Autocorrelation Function (ACF) of AQHI")
+
+plt.show()
+
+# PACF
+
+plt.figure(figsize=(10,5))
+
+plot_pacf(
+
+    aqhi_series,
+
+    lags=50,
+
+    method="ywm"
+
+)
+
+plt.title("Partial Autocorrelation Function (PACF) of AQHI")
+
+plt.show()
+ 
+ #save the acf and pacf plots
+plt.savefig("acf_plot.png")
+
+plt.close()
+
+plt.savefig("pacf_plot.png")
+
+plt.close()
+
+#AQHI over time plot
+plt.figure(figsize=(12,5))
+plt.plot(df_daily["Date"], df_daily["AQHI"])
+plt.title("AQHI Over Time")
+plt.xlabel("Year")
+plt.ylabel("AQHI")
+plt.show()
+
+#NO2 over time plot
+plt.figure(figsize=(12,5))
+plt.plot(df_daily["Date"], df_daily["NO2"])
+plt.title("NO2 Over Time")
+plt.xlabel("Year")
+plt.ylabel("NO2")
+plt.show()
+
+#PM25 over time plot
+plt.figure(figsize=(12,5))
+plt.plot(df_daily["Date"], df_daily["PM25"])
+plt.title("PM25 Over Time")
+plt.xlabel("Year")
+plt.ylabel("PM25")
+plt.show()
+
+#O3 over time plot
+plt.figure(figsize=(12,5))
+plt.plot(df_daily["Date"], df_daily["O3"])
+plt.title("O3 Over Time")
+plt.xlabel("Year")
+plt.ylabel("O3")
+plt.show()
+
+#AHI Histogram
+plt.hist(df_daily["AQHI"], bins=30)
+plt.title("AQHI Distribution")
+plt.xlabel("AQHI")
+plt.ylabel("Frequency")
+plt.show()
