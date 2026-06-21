@@ -12,15 +12,11 @@ from statsmodels.graphics.tsaplots import (
 
 # Load the datasets
 
-df2020 = pd.read_csv("Montreal - Trudeau Airport/2020/data_2020.csv")
-
-df2021 = pd.read_csv("Montreal - Trudeau Airport/2021/data_2021.csv")
-
-df2022 = pd.read_csv("Montreal - Trudeau Airport/2022/data_2022.csv")
-
-df2023 = pd.read_csv("Montreal - Trudeau Airport/2023/data_2023.csv")
-
-df2024 = pd.read_csv("Montreal - Trudeau Airport/2024/data_2024.csv")
+df2020 = pd.read_csv("data/raw/Montreal - Trudeau Airport/2020/data_2020.csv")
+df2021 = pd.read_csv("data/raw/Montreal - Trudeau Airport/2021/data_2021.csv")
+df2022 = pd.read_csv("data/raw/Montreal - Trudeau Airport/2022/data_2022.csv")
+df2023 = pd.read_csv("data/raw/Montreal - Trudeau Airport/2023/data_2023.csv")
+df2024 = pd.read_csv("data/raw/Montreal - Trudeau Airport/2024/data_2024.csv")
 
 # Combine them
 
@@ -458,9 +454,10 @@ print("Label vector shape:", y.shape)
 # Save processed dataset
 
 df_daily.to_csv(
-    "air_quality_project_dataset.csv",
+    "data/processed/air_quality_project_dataset.csv",
     index=False
 )
+
 print("CSV saved successfully!")
 # ACF and PACF Analysis
 
