@@ -26,15 +26,13 @@ def model_evaluation (true_values, predicted_values):
 #- min_samples_split: The minimum number of samples required to split a node. 
 # -min_samples_leaf: The minimum number of samples required to be at a leaf node.
 # -max_features: The number of features to consider when looking for the best split. THis can just be set to: auto which will use all features, sqrt which uses the square root of the number of features, and log2 which uses the logarithm base 2 of the number of features.
-# -min_weight_fraction_leaf: The minimum fraction of input samples required to be at a leaf node. THis can help with class imbalance, but does not really apply for our regression problem.
 
 def get_param_grid_DT():
     param_grid_DT = { #Giving a range of values for the hyperparameters to be tested in GridSearchCV.
     'max_depth': [None, 10, 20, 30],
     'min_samples_split': [2, 5, 10],
     'min_samples_leaf': [1, 2, 4],
-    'max_features': [None, 'sqrt', 'log2'],
-    'min_weight_fraction_leaf': [0.0, 0.1, 0.2]
+    'max_features': [None, 'sqrt', 'log2']
 }
     return param_grid_DT
 
@@ -53,3 +51,30 @@ def get_best_DT_model(DT_model, param_grid_DT, X_train, y_train):
     return grid_searchDT #Returning GridSearchCV results.
 
 
+#Decision Tree regression model hyperparameter tuning function (same idea as before):
+
+#A brief explaination of the hyperparameters (Based on the Lecture 8 notes and the features from the Decision Tree regression model):
+#- n_estimators: The number of trees in the forest.
+#- max_depth: Controls the maximum depth of each tree.
+#- min_samples_leaf: The minimum number of samples required to be at a leaf node.
+#- min_samples_split: The minimum number of samples required to split a node. .
+#- max_features: The number of features considered per split.
+
+def get_param_grid_RF():
+    param_grid_RF = {
+    'n_estimators': [10, 50, 100],
+    'max_depth': [None, 10, 20],
+    'min_samples_split': [2, 5],
+    'min_samples_leaf': [1, 2, 4],
+    'max_features': [None, 'sqrt']
+   
+}
+    return param_grid_RF
+
+#Tuning the model for the best hyperparameters using GridSearchCV:
+def get_best_RF_model(RF_model, param_grid_RF, X_train, y_train):
+    time_series_split = TimeSeriesSplit(n_splits=5) #Using TimeSeriesSplit for the CV, since we are working with time series data.
+    grid_searchRF = GridSearchCV(estimator=RF_model, param_grid=param_grid_RF, scoring = 'neg_mean_squared_error', cv=time_series_split) #CV means the amount of cross validation folds that were used. From Lecture 4, this is usually 5 or 10. We will use TimeSeriesSplit for the CV.
+    grid_searchRF.fit(X_train, y_train) #Using the training data only. This is very important; we do not want to use the test data to find the best hyperparameters, as this would lead to data leakage and overfitting.
+
+    return grid_searchRF #Returning GridSearchCV results.
