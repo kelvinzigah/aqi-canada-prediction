@@ -1,8 +1,20 @@
 # AQI Canada Prediction
 
-Predicting Air Quality Index (AQI) values across Canadian cities using machine learning.
+Predicting next-day Air Quality Health Index (AQHI) values for the Montreal Trudeau Airport region using machine learning.
 
-Goal: Our project goal is to train various machine learning models to accurately predict **future** AQHI values in the Montreal, Trudeau airport region. This will be done by using past historical measurements of pollutants and AQHI values at specific timeframes. 
+The AQHI is a Canadian government scale (1 to 10+) that measures how harmful outdoor air is to human health. It is calculated from three pollutants: O3, NO2, and PM2.5. We trained five regression models on historical NAPS pollutant data (2020 to 2024) to predict what the next day AQHI will be.
+
+## Results
+
+| Model | RMSE | MAE | MAPE |
+|---|---|---|---|
+| Baseline Linear Regression | 0.407 | 0.313 | 14.2% |
+| Linear Regression with Lag Features | 0.401 | 0.307 | 13.7% |
+| Lasso Regression | 0.406 | 0.312 | 14.0% |
+| Decision Tree | 0.440 | 0.337 | 14.9% |
+| **Random Forest** | **0.404** | **0.303** | **13.6%** |
+
+Random Forest was the best performing model with an average error of 0.30 AQHI points on the 2024 test set.
 
 
 

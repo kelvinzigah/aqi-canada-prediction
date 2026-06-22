@@ -16,7 +16,9 @@ from load_data import load_data
 from models import linear_regression_model_base, linear_regression_model_lag, lasso_regression_model, decision_tree_regression_model, random_forest_regression_model, knn_regression_model
 from sklearn.model_selection import train_test_split
 from features import TARGET_VARIABLE
-from evaluate import model_evaluation
+from evaluate import get_best_DT_model, get_param_grid_DT, model_evaluation
+from sklearn.model_selection import GridSearchCV
+
 
 import numpy as np
 import pandas as pd
@@ -68,7 +70,6 @@ print("MAE:", mae)
 print("RMSE:", rmse)
 print("MAPE:", mape)
 
-
 #2) Linear Regression with lag features
 #From now on, we will use all intended features to help predict the future AQHI value.
 
@@ -78,22 +79,19 @@ linear_model.fit(X_train, y_train)
 y_pred_linear = linear_model.predict(X_test) #Making predictions on the test dataset using the trained linear regression model.
 
 mse, mae, rmse, mape = model_evaluation(y_test, y_pred_linear) 
-print("For the baseline linear regression model with lag features: \n")
+print("For the linear regression model with lag features: \n")
 print("MSE:", mse)
 print("MAE:", mae)
 print("RMSE:", rmse)
 print("MAPE:", mape)
 
 #3) Lasso Regression model
-#Using all features - Lasso will automatically shrink wights of less important ones to zero
-
 lasso_model = lasso_regression_model()
 lasso_model.fit(X_train, y_train)
 
 y_pred_lasso = lasso_model.predict(X_test)
 
 mse, mae, rmse, mape = model_evaluation(y_test, y_pred_lasso)
-
 print("For the Lasso regression model: \n")
 print("MSE:", mse)
 print("MAE:", mae)
@@ -101,12 +99,22 @@ print("RMSE:", rmse)
 print("MAPE:", mape)
 
 
-#4) Decision Tree regression model
+#4) Decision Tree regression model (Hyperparameter tuning is used here).
 
 DT_model = decision_tree_regression_model()
 DT_model.fit(X_train, y_train)
 
-y_pred_DT = DT_model.predict(X_test)
+
+param_grid_DT = get_param_grid_DT() #Getting the hyperparameter grid for the decision tree regression model from the function defined in evaluate.py
+grid_search_DT = get_best_DT_model(DT_model, param_grid_DT, X_train, y_train) #Tuning the decision tree regression model for the best hyperparameters using the function defined in evaluate.py
+
+#Printing the best hyperparameters for the decision tree regression model found by GridSearchCV:
+print("Best hyperparameters for the decision tree regression model found by GridSearchCV:", grid_search_DT.best_params_)
+
+
+best_DT_model_hyperparameters = grid_search_DT.best_estimator_ #Getting the best model with the best hyperparameters from the grid search results
+y_pred_DT = best_DT_model_hyperparameters.predict(X_test) #Setting the prediction target to the best estimator found by GridSearchCV
+
 
 mse, mae, rmse, mape = model_evaluation(y_test, y_pred_DT) 
 print("For the Decision Tree regression model: \n")
@@ -115,11 +123,7 @@ print("MAE:", mae)
 print("RMSE:", rmse)
 print("MAPE:", mape)
 
-
 #5) Random Forest regression model
-#Ensemble of decision trees — typically the strongest performer on tabular
-#data.
-
 RF_model = random_forest_regression_model()
 RF_model.fit(X_train, y_train)
 
@@ -131,6 +135,5 @@ print("MSE:", mse)
 print("MAE:", mae)
 print("RMSE:", rmse)
 print("MAPE:", mape)
-
 
     
