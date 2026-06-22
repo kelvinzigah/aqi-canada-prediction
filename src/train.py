@@ -16,7 +16,7 @@ from load_data import load_data
 from models import linear_regression_model_base, linear_regression_model_lag, lasso_regression_model, decision_tree_regression_model, random_forest_regression_model, knn_regression_model
 from sklearn.model_selection import train_test_split
 from features import TARGET_VARIABLE
-from evaluate import model_evaluation
+from evaluate import get_best_DT_model, get_param_grid_DT, model_evaluation
 from sklearn.model_selection import GridSearchCV
 
 
@@ -54,8 +54,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle
 print("Training sample length:", len(X_train))
 print("Test sample length:", len(X_test))
 
-#Add code to show first 5 rows of training and test, to make sure its sorted.
-
 
 #1) Simple Linear Regression Model
 #For our baseline model, only AQHI will be used to compare to future AQHI values. The reason is that we want to have a basic comparison to start with.
@@ -79,7 +77,6 @@ linear_model = linear_regression_model_lag()
 linear_model.fit(X_train, y_train)
 
 y_pred_linear = linear_model.predict(X_test) #Making predictions on the test dataset using the trained linear regression model.
-y_pred_linear = linear_model.predict(X_test) #Making predictions on the test dataset using the trained linear regression model.
 
 mse, mae, rmse, mape = model_evaluation(y_test, y_pred_linear) 
 print("For the linear regression model with lag features: \n")
@@ -102,40 +99,22 @@ print("RMSE:", rmse)
 print("MAPE:", mape)
 
 
-#4) Decision Tree regression model
+#4) Decision Tree regression model (Hyperparameter tuning is used here).
 
 DT_model = decision_tree_regression_model()
 DT_model.fit(X_train, y_train)
 
-#Using GridSearchCV to find the best hyperparameters for the decision tree regression model.
-#Source: https://www.geeksforgeeks.org/machine-learning/hyperparameter-tuning-in-linear-regression/
-#A breif explaination of the hyperparameters (Source: https://www.geeksforgeeks.org/machine-learning/how-to-tune-a-decision-tree-in-hyperparameter-tuning/):
-#- max_depth: Controls the maximum depth on how long the tree can grow. Deeper tree can capture more complex patterns, but can also lead to overfitting. A shallower tree may not capture all the patterns in the data, but is more genralized.
-#- min_samples_split: The minimum number of samples required to split a node. 
-# -min_samples_leaf: The minimum number of samples required to be at a leaf node.
-# -max_features: The number of features to consider when looking for the best split. THis can just be set to: auto which will use all features, sqrt which uses the square root of the number of features, and log2 which uses the logarithm base 2 of the number of features.
-# -min_weight_fraction_leaf: The minimum fraction of input samples required to be at a leaf node. THis can help with class imbalance, but does not really apply for our regression problem.
+
+param_grid_DT = get_param_grid_DT() #Getting the hyperparameter grid for the decision tree regression model from the function defined in evaluate.py
+grid_search_DT = get_best_DT_model(DT_model, param_grid_DT, X_train, y_train) #Tuning the decision tree regression model for the best hyperparameters using the function defined in evaluate.py
+
+#Printing the best hyperparameters for the decision tree regression model found by GridSearchCV:
+print("Best hyperparameters for the decision tree regression model found by GridSearchCV:", grid_search_DT.best_params_)
 
 
-param_grid = { #Giving a range of values for the hyperparameters to be tested in GridSearchCV.
-    'max_depth': [None, 10, 20, 30],
-    'min_samples_split': [2, 5, 10],
-    'min_samples_leaf': [1, 2, 4],
-    'max_features': ['auto', 'sqrt', 'log2'],
-    'min_weight_fraction_leaf': [0.0, 0.1, 0.2]
-}
-
-#Using GridSearchCV to find the best hyperparameters for the decision tree regression model.
-#Source: https://www.geeksforgeeks.org/machine-learning/how-to-tune-a-decision-tree-in-hyperparameter-tuning/
-grid_search = GridSearchCV(estimator=DT_model, param_grid=param_grid, cv=5) #CV means the amount of cross validation folds that were used. From Lecture 4, this is usually 5 or 10. 
-grid_search.fit(X_train, y_train) #Using the training data only. This is very important; we do not want to use the test data to find the best hyperparameters, as this would lead to data leakage and overfitting.
-
-best_DT_model_hyperparameters = grid_search.best_estimator_ #Getting the best estimator from the grid search.
-print("Best hyperparameters for the decision tree regression model:", best_DT_model_hyperparameters)
-
+best_DT_model_hyperparameters = grid_search_DT.best_estimator_ #Getting the best model with the best hyperparameters from the grid search results
 y_pred_DT = best_DT_model_hyperparameters.predict(X_test) #Setting the prediction target to the best estimator found by GridSearchCV
 
-#y_pred_DT = DT_model.predict(X_test)
 
 mse, mae, rmse, mape = model_evaluation(y_test, y_pred_DT) 
 print("For the Decision Tree regression model: \n")
