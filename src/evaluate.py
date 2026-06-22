@@ -17,6 +17,24 @@ def model_evaluation (true_values, predicted_values):
 
 #The hyperpatameter tuning functions will be listed and explained here, to make the train.py code easier to read/cleaner.
 
+
+#Lasso regression model hyperparameter tuning function:
+#- Alpha: The regularization strength.
+def get_param_grid_lasso():
+    param_grid_lasso = {
+    'alpha': [0.01, 0.1, 1, 10, 100]
+}
+    return param_grid_lasso
+
+#Tuning the model for the best hyperparameters using GridSearchCV:
+def get_best_lasso_model(lasso_model, param_grid_lasso, X_train, y_train):
+    time_series_split = TimeSeriesSplit(n_splits=5) #Using TimeSeriesSplit for the CV, since we are working with time series data.
+    grid_search_lasso = GridSearchCV(estimator=lasso_model, param_grid=param_grid_lasso, scoring = 'neg_mean_squared_error', cv=time_series_split) #CV means the amount of cross validation folds that were used. From Lecture 4, this is usually 5 or 10. We will use TimeSeriesSplit for the CV.
+    grid_search_lasso.fit(X_train, y_train) #Using the training data only. This is very important; we do not want to use the test data to find the best hyperparameters, as this would lead to data leakage and overfitting.
+
+    return grid_search_lasso #Returning GridSearchCV results.
+
+
 #Decision Tree regression model hyperparameter tuning function:
 
 #Using GridSearchCV to find the best hyperparameters for the decision tree regression model.
@@ -36,7 +54,7 @@ def get_param_grid_DT():
 }
     return param_grid_DT
 
-#Tuning the model for the best hyperparameters using GridSearchCV:.
+#Tuning the model for the best hyperparameters using GridSearchCV:
 #Some important things about this function (Source: https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html):
 # -The cross validation used is NOT the standard k-folds, but a variation called TimeSeriesSplit, which is used for time series data.
 # -With TimeSeriesSplit, the data is split into k folds, but the test set is always after the training set.
