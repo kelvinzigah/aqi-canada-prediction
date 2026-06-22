@@ -1,10 +1,16 @@
 
 #Since most of our models will require the same evaluation metrics, we'll create the function here which can be reused in train.py
+import warnings
+
+import numpy as np
+
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import root_mean_squared_error
 from sklearn.metrics import mean_absolute_percentage_error
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
+
+from models import arima_model
 
 def model_evaluation (true_values, predicted_values):
     mse = mean_squared_error(true_values, predicted_values) #Mean Squared Error: Seeing how well the model converged, and shows the overall error delta.
@@ -51,5 +57,33 @@ def get_best_DT_model(DT_model, param_grid_DT, X_train, y_train):
     grid_searchDT.fit(X_train, y_train) #Using the training data only. This is very important; we do not want to use the test data to find the best hyperparameters, as this would lead to data leakage and overfitting.
 
     return grid_searchDT #Returning GridSearchCV results.
+
+
+#ARIMA rolling one-step-ahead forecast function:
+#ARIMA is a pure time series model, so it does not fit the same X/y pattern as the other models. Instead, it forecasts the AQHI series one step at a time.
+#To compare it fairly with the other models, we forecast the test period one day at a time:
+# - The series column is the daily AQHI values, where AQHI_NextDay[i] is just AQHI[i+1] (the next day's value).
+# - For each test day i, we fit ARIMA on every AQHI value known up to and including day i, then forecast the next day.
+# - That forecast is AQHI[i+1], which lines up exactly with the AQHI_NextDay target the other models predict.
+#This is called a rolling (or walk-forward) forecast. We refit at every step so the model always uses all the data available up to that day, with no data leakage from the future.
+#Sources:
+#https://www.statsmodels.org/stable/generated/statsmodels.tsa.arima.model.ARIMA.html
+#https://machinelearningmastery.com/make-sample-forecasts-arima-python/
+def rolling_arima_forecast(series, split_index, order=(2, 0, 0)):
+    series = np.asarray(series, dtype=float) #Working with the raw AQHI values as a plain numeric array.
+    predictions = [] #This will hold one forecast per test day.
+
+    #We loop over every test day. range(split_index, len(series)) matches the test rows used by train_test_split with shuffle=False.
+    for i in range(split_index, len(series)):
+        history = series[:i + 1] #All AQHI values known up to and including day i (no future data).
+
+        with warnings.catch_warnings(): #Hiding the harmless "no frequency information" notices statsmodels prints for a plain numeric series.
+            warnings.simplefilter("ignore")
+            fitted_model = arima_model(history, order=order).fit() #Fitting ARIMA on the history available at day i.
+            next_day_forecast = fitted_model.forecast(steps=1)[0] #Forecasting the next day, which corresponds to the AQHI_NextDay target for day i.
+
+        predictions.append(next_day_forecast)
+
+    return np.array(predictions) #Returning all the one-step-ahead forecasts, aligned with y_test.
 
 
