@@ -15,8 +15,8 @@
 from load_data import load_data
 from models import linear_regression_model_base, linear_regression_model_lag, lasso_regression_model, decision_tree_regression_model, random_forest_regression_model, knn_regression_model
 from sklearn.model_selection import train_test_split
-from features import TARGET_VARIABLE
-from evaluate import get_best_DT_model, get_best_RF_model, get_best_lasso_model, get_param_grid_DT, get_param_grid_RF, get_param_grid_lasso, model_evaluation
+from features import TARGET_VARIABLE, ARIMA_ORDER
+from evaluate import get_best_DT_model, get_best_RF_model, get_best_lasso_model, get_param_grid_DT, get_param_grid_RF, get_param_grid_lasso, model_evaluation, rolling_arima_forecast
 from sklearn.model_selection import GridSearchCV
 
 
@@ -144,4 +144,16 @@ print("MAE:", mae)
 print("RMSE:", rmse)
 print("MAPE:", mape)
 
-    
+#6) ARIMA model (pure univariate time series model)
+#Unlike the models above, ARIMA does not use the feature columns. It forecasts the next AQHI value from the past AQHI values only.
+#We use a rolling one-step-ahead forecast so it is evaluated on the same test days as the other models. See rolling_arima_forecast in evaluate.py.
+
+split_index = len(X_train) #The split index matches the time-based train/test split used above (shuffle=False).
+y_pred_arima = rolling_arima_forecast(data["AQHI"].values, split_index, order=ARIMA_ORDER)
+
+mse, mae, rmse, mape = model_evaluation(y_test, y_pred_arima)
+print("For the ARIMA model", ARIMA_ORDER, ": \n")
+print("MSE:", mse)
+print("MAE:", mae)
+print("RMSE:", rmse)
+print("MAPE:", mape)
