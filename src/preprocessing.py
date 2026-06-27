@@ -11,7 +11,7 @@ from statsmodels.graphics.tsaplots import (
 #----------------------------------------------------------------
 
 # Load the datasets
-
+df2019 = pd.read_csv("data/raw/Montreal - Trudeau Airport/2019/data_2019.csv")
 df2020 = pd.read_csv("data/raw/Montreal - Trudeau Airport/2020/data_2020.csv")
 df2021 = pd.read_csv("data/raw/Montreal - Trudeau Airport/2021/data_2021.csv")
 df2022 = pd.read_csv("data/raw/Montreal - Trudeau Airport/2022/data_2022.csv")
@@ -22,7 +22,7 @@ df2024 = pd.read_csv("data/raw/Montreal - Trudeau Airport/2024/data_2024.csv")
 
 df = pd.concat(
 
-    [df2020, df2021, df2022, df2023, df2024],
+    [df2019, df2020, df2021, df2022, df2023, df2024],
     ignore_index=True
 )
 # Display first rows of the combined dataset
