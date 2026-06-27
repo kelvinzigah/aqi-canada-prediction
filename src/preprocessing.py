@@ -256,6 +256,9 @@ df_daily = df_3hour.groupby(
 
 df_daily = df_daily.reset_index()
 
+#create previous day's AQHI as a feature
+df_daily["AQHI_PreviousDay"] = df_daily["AQHI"].shift(1)
+
 # Create next day's AQHI (target variable)
 
 df_daily["AQHI_NextDay"] = df_daily["AQHI"].shift(-1)
@@ -270,6 +273,7 @@ print(
             "Date",
 
             "AQHI",
+            "AQHI_PreviousDay",
 
             "AQHI_NextDay"
 
@@ -279,19 +283,9 @@ print(
 
 )
 
-# Lag feature for AQHI 50 days (creates 50 features)
 
-for lag in range(1, 51):
 
-    df_daily[f"AQHI_Lag_{lag}"] = df_daily["AQHI"].shift(lag)
 
-# Show the lagged data structure
-
-lag_columns = ["Date", "AQHI"] + [f"AQHI_Lag_{lag}" for lag in range(1, 51)]
-
-print("Lagged AQHI data structure:")
-
-print(df_daily[lag_columns].head(60))
 
 # Create Season feature
 
@@ -387,10 +381,8 @@ print(df_daily.shape)
 # Remove only rows where the target variable is missing
 df_daily = df_daily[df_daily["AQHI_NextDay"].notna()]
 
-# Remove rows with missing lag values
-lag_feature_columns = [f"AQHI_Lag_{lag}" for lag in range(1, 51)]
-
-df_daily = df_daily.dropna(subset=lag_feature_columns)
+# Remove rows with missing preious day's AQHI values
+df_daily = df_daily[df_daily["AQHI_PreviousDay"].notna()]
 
 ordered_columns = (
     [
@@ -404,9 +396,11 @@ ordered_columns = (
         "Season",
         "Season_Code"
     ]
-    + [f"AQHI_Lag_{lag}" for lag in range(50, 0, -1)]
+    
     + [
+        "AQHI_PreviousDay",
         "AQHI",
+        
         "AQHI_NextDay"
     ]
 )
@@ -443,14 +437,13 @@ X = df_daily[
 
         "PM25",
 
-    ]
+    
+    "AQHI_PreviousDay",
 
-    + [f"AQHI_Lag_{lag}" for lag in range(50, 0, -1)]
-
-    + ["AQHI"]
+    "AQHI"
 
 ]
-
+]
 y = df_daily["AQHI_NextDay"]
 
 print("Feature matrix shape:", X.shape)
@@ -464,47 +457,6 @@ df_daily.to_csv(
 )
 
 print("CSV saved successfully!")
-# ACF and PACF Analysis
-
-
-aqhi_series = df_daily["AQHI"].dropna()
-
-# ACF
-
-plt.figure(figsize=(10,5))
-
-plot_acf(aqhi_series, lags=50)
-
-plt.title("Autocorrelation Function (ACF) of AQHI")
-
-plt.show()
-
-# PACF
-
-plt.figure(figsize=(10,5))
-
-plot_pacf(
-
-    aqhi_series,
-
-    lags=50,
-
-    method="ywm"
-
-)
-
-plt.title("Partial Autocorrelation Function (PACF) of AQHI")
-
-plt.show()
- 
- #save the acf and pacf plots
-plt.savefig("acf_plot.png")
-
-plt.close()
-
-plt.savefig("pacf_plot.png")
-
-plt.close()
 
 #AQHI over time plot
 plt.figure(figsize=(12,5))
