@@ -25,6 +25,11 @@ df = pd.concat(
     [df2019, df2020, df2021, df2022, df2023, df2024],
     ignore_index=True
 )
+
+# Standardize inconsistent pollutant naming for 2019 dataset
+
+df["Pollutant"] = df["Pollutant"].replace("PM2.5", "PM25")
+
 # Display first rows of the combined dataset
 
 print(df.head())
