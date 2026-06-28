@@ -103,9 +103,9 @@ def rolling_arima_forecast(series, split_index, order=(2, 0, 0)):
     return np.array(predictions) #Returning all the one-step-ahead forecasts, aligned with y_test.
 
 
-#Decision Tree regression model hyperparameter tuning function (same idea as before):
+#Random Forest regression model hyperparameter tuning function (same idea as before):
 
-#A brief explaination of the hyperparameters (Based on the Lecture 8 notes and the features from the Decision Tree regression model):
+#A brief explaination of the hyperparameters (Based on the Lecture 8 notes and the features from the source: https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html)
 #- n_estimators: The number of trees in the forest.
 #- max_depth: Controls the maximum depth of each tree.
 #- min_samples_leaf: The minimum number of samples required to be at a leaf node.

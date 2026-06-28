@@ -1,5 +1,4 @@
 from sklearn.linear_model import LinearRegression, Lasso
-from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from statsmodels.tsa.arima.model import ARIMA
@@ -11,8 +10,6 @@ from statsmodels.tsa.arima.model import ARIMA
 #https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
 #https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_error.html
 #https://scikit-learn.org/1.5/auto_examples/linear_model/plot_ols.html
-#https://www.geeksforgeeks.org/machine-learning/k-nearest-neighbors-knn-regression-with-scikit-learn/
-#https://www.geeksforgeeks.org/machine-learning/k-nearest-neighbours/
 #https://www.geeksforgeeks.org/machine-learning/knn-vs-decision-tree-in-machine-learning/
 
 
@@ -33,14 +30,6 @@ def linear_regression_model_lag():
 #Reason: Since we are including extra features outside the AQHI formula, we want to use a regularization model to prevent overfitting and improve the generalization of the model.
 def lasso_regression_model():
     return Lasso(alpha=0.1) #Setting alpha to 0.1 for regularization strength, this can be tuned based on the dataset and performance.
-
-
-
-#3) K-Nearest Neighbors regression model (non-linear model)
-#Reason: Does not assume anything about the data distribution. It can capture non-linear patterns between features and AQHI.
-#Important note: Scaling is critical here since KNN uses distance between data points.
-def knn_regression_model():
-    return KNeighborsRegressor(n_neighbors=5) #Setting n_neighbors to 5, this can be tuned based on dataset performance.
 
 
 #4) Decision Tree regression model (non-linear model)
