@@ -95,7 +95,7 @@ You should see packages like `pandas`, `scikit-learn`, `jupyter`, etc.
 Run notebooks in order:
 
 1. `01_eda.ipynb` — Exploratory data analysis
-2. `02_preprocessing.ipynb` — Cleaning and feature engineering
+2. `preprocessing.py` — Cleaning and feature engineering
 3. `03_model_training.ipynb` — Train and tune models
 4. `04_evaluation.ipynb` — Evaluate and compare results
 
