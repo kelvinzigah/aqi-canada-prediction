@@ -13,11 +13,13 @@
 
 
 from load_data import load_data
-from models import linear_regression_model_base, linear_regression_model_lag, lasso_regression_model, decision_tree_regression_model, random_forest_regression_model, knn_regression_model
+from models import linear_regression_model_base, linear_regression_model_lag, lasso_regression_model, decision_tree_regression_model, random_forest_regression_model
 from sklearn.model_selection import train_test_split
 from features import TARGET_VARIABLE, ARIMA_ORDER
 from evaluate import get_best_DT_model, get_best_RF_model, get_best_lasso_model, get_param_grid_DT, get_param_grid_RF, get_param_grid_lasso, model_evaluation, rolling_arima_forecast
 from sklearn.model_selection import GridSearchCV
+import joblib
+from pathlib import Path
 
 
 import numpy as np
@@ -27,13 +29,13 @@ import pandas as pd
 #SETUP BEFORE TRAINING THE MODELS:
 #-----------------------------------------------------------------------
 
-data = load_data() #Importing the training dataset, which has been preprocessed in preprocess_data.py and sent to load_data.py.
+data = load_data() #Importing the training dataset, which has been preprocessed in preprocess_data.py and taken from load_data.py.
 print("Dataset overview:") #Giving a small overview of the dataset:
 print(data.info()) #Print the summary of the dataset, including the number of non-null values and the data types of each column.
 print(data.head()) #Print the first 5 rows of the dataset
 
 #Identifiying our input features and target variable:
-X = data.drop(["index", "Date", "Season", TARGET_VARIABLE], axis = 1, errors = "ignore") #Getting our input features [Train_1]
+X = data.drop(["index", "Date", "Season", TARGET_VARIABLE], axis = 1, errors = "ignore") #Getting our input features, and getting rid of the ones we dont need. [Train_1]
 y = data[TARGET_VARIABLE] #Getting our target.
 
 print("Input features:")
@@ -53,7 +55,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle
 
 print("Training sample length:", len(X_train))
 print("Test sample length:", len(X_test))
-
 
 #1) Simple Linear Regression Model
 #For our baseline model, only AQHI will be used to compare to future AQHI values. The reason is that we want to have a basic comparison to start with.
@@ -157,3 +158,7 @@ print("MSE:", mse)
 print("MAE:", mae)
 print("RMSE:", rmse)
 print("MAPE:", mape)
+
+MODEL_PATH = Path(__file__).resolve().parent.parent / "models" / "saved_model.pkl"  # Path to save the model
+joblib.dump(best_RF_model_hyperparameters, MODEL_PATH)
+print("Saved Random Forest model to", MODEL_PATH)
