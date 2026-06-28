@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 
 DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "processed" / "air_quality_project_dataset.csv"
-DATA_PATH_DEMO = Path(__file__).resolve().parent.parent / "data" / "processed" / "air_quality_project_dataset_demo.csv"
+DATA_PATH_DEMO = Path(__file__).resolve().parent.parent / "data" / "processed" / "air_quality_project_dataset_Demo.csv"
 
 #Loading the preprocessed training dataset. This will be called in the main function to load the data before training the model.
 def load_data():

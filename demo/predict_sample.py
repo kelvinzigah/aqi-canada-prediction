@@ -2,11 +2,17 @@
 #We'll only use the best model from the training/test results: Random Forest.
 
 
-from evaluate import model_evaluation
-from features import TARGET_VARIABLE
-from src.load_data import load_data_demo
+import sys
 from pathlib import Path
 import joblib
+
+# Put the project's src/ folder on the path so the imports below resolve,
+# regardless of which directory this script is run from.
+sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
+
+from evaluate import model_evaluation
+from features import TARGET_VARIABLE
+from load_data import load_data_demo
 
 data_demo = load_data_demo()
 print("Demo dataset overview:") #Giving a small overview of the dataset:
@@ -20,6 +26,7 @@ rf_model_demo = joblib.load(MODEL_PATH)  # Load the saved model from the specifi
 
 #Identifiying our input features and target variable:
 X = data_demo.drop(["index", "Date", "Season", TARGET_VARIABLE], axis = 1, errors = "ignore") #Getting our input features, and getting rid of the ones we dont need. [Train_1]
+X = X[rf_model_demo.feature_names_in_] #Reorder columns to match the exact order the model was trained on (the demo CSV orders Season_Code differently).
 y = data_demo[TARGET_VARIABLE] #Getting our target.
 
 print("Input features:")
